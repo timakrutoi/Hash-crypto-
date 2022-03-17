@@ -18,12 +18,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="md5.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="md4.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="old.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
