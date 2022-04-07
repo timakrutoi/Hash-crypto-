@@ -1,27 +1,118 @@
 #include "md4.h"
-#include "md5.h"
+#include "RSA.h"
+#include "sercantutar-infint-fc767ed/InfInt.h"
+#include <random>
+#include <algorithm>
+
+std::string random_string(std::size_t length, uint16_t seed=1234) {
+	const std::string CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,:;";
+
+	std::random_device random_device;
+	std::mt19937 generator(random_device());
+	//generator.seed(seed);
+	std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
+
+	std::string random_string;
+
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		random_string += CHARACTERS[distribution(generator)];
+	}
+
+	return random_string;
+}
+
+int test1(string s, int len = 20, const int h_size = 8, int seed = 1234) {
+	auto h0 = md4(s).substr(0, h_size);
+	string hi = md4(random_string(len, seed)).substr(0, h_size);
+
+	vector<string> y;
+
+	int N = 1;
+	int l = 100000;
+
+	while (h0 != hi && N < l) {
+		seed++;
+		string msg = random_string(len, seed);
+		hi = md4(msg).substr(0, h_size);
+		auto place = find(y.begin(), y.end(), hi);
+		/*
+		if (place == y.end())
+			y.push_back(hi);
+		else {
+			cout << "Collision found: h( " << place - y.begin() << " - " << N << " ) = " << hi << endl;
+		}
+		*/
+		N++;
+		//cout << hi << endl;
+	}
+
+	return N;
+}
+
+int test2(string s, int len = 20, const int h_size = 8, int seed = 1234) {
+	auto h0 = md4(s).substr(0, h_size);
+	string hi = md4(random_string(len, seed)).substr(0, h_size);
+
+	vector<string> y;
+
+	int N = 1;
+	int l = 100000;
+
+	while (h0 != hi && N < l) {
+		seed++;
+		string msg = random_string(len, seed);
+		hi = md4(msg).substr(0, h_size);
+		auto place = find(y.begin(), y.end(), hi);
+
+		if (place == y.end())
+			y.push_back(hi);
+		else {
+			//cout << "Collision found: h( " << place - y.begin() << " - " << N << " ) = " << hi << endl;
+			return N - (place - y.begin());
+		}
+		
+		N += y.size();
+		//cout << hi << endl;
+	}
+
+	return N;
+}
+
+void test_crypt(string m, InfInt q, InfInt p, InfInt e=65537) {
+	InfInt mes = m;
+
+	RSA<InfInt> sys(q, p, e);
+
+	InfInt n = sys.get_n(), d = sys.get_private_key();
+	cout << "mes: \n\t" << mes << endl;
+
+	InfInt crypted = crypt(mes, e, n);
+	cout << "Crypted mes: \n\t" << crypted << endl;
+
+	InfInt decrypted = crypt(crypted, d, n);
+	cout << "Decrypted mes: \n\t" << decrypted << endl;
+}
+
+void test_signature(string m, InfInt q, InfInt p, InfInt e = 65537) {
+	InfInt mes = m;
+
+	RSA<InfInt> sys(q, p, e);
+
+	InfInt n = sys.get_n(), d = sys.get_private_key();
+	InfInt hashed = md4(m);
+	cout << "mes: \n\t" << mes << endl;
+	cout << "hash: \n\t" << hashed << endl;
+		
+	InfInt crypted = crypt(hashed, d, n);
+	cout << "Signature: \n\t" << crypted << endl;
+
+	InfInt decrypted = crypt(crypted, e, n);
+	cout << "Decrypted mes: \n\t" << decrypted << endl;
+}
 
 int main() {
-	string s = "The quick brown fox jumps over the lazy dog";
-	string s1 = "55555555555555555555555";
-
-	/*
-	correct.push_back(0x1bee69a4);
-	correct.push_back(0x6ba81118);
-	correct.push_back(0x5c194762);
-	correct.push_back(0xabaeae90);
-
-	correct.push_back(0x31d6cfe0);
-	correct.push_back(0xd16ae931);
-	correct.push_back(0xb73c59d7);
-	correct.push_back(0xe0c089c0);
-
-	*/
-
-	auto res = md4(s);
-	
-	for (size_t i = 0; i < res.size(); ++i) {
-		cout << hex << res[i] << " ";
-		if (i == 3) cout << endl;
-	}
+	InfInt q = "849787074319711721459362812091";
+	InfInt p = "725486187367325002596395878223";
+	test_signature("1234", q, p);
 }

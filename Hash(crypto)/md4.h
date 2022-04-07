@@ -2,11 +2,12 @@
 
 #define DEBUG_MESSAGES false
 
+#include <iomanip>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <bitset>
-#include <iomanip>
 
 using namespace std;
 
@@ -153,7 +154,7 @@ uint32_t r3(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t
 	//return (a + H(b, c, d) + x + tmp) << s;
 }
 
-vector<uint32_t> md4(string s) {
+string md4(string s) {
 	auto data = s2int(s);
 
 	size_t blocks_count = data.size() / 16;
@@ -254,11 +255,18 @@ vector<uint32_t> md4(string s) {
 		D = D + DD;
 	}
 
+	/*
 	vector<uint32_t> res;
-	res.push_back(_byteswap_ulong(A));
+	#res.push_back(_byteswap_ulong(A));
 	res.push_back(_byteswap_ulong(B));
 	res.push_back(_byteswap_ulong(C));
 	res.push_back(_byteswap_ulong(D));
+	*/
 
-	return res;
+	stringstream ss;
+	ss << hex << _byteswap_ulong(A) << _byteswap_ulong(B) << _byteswap_ulong(C) << _byteswap_ulong(D);
+	//ss << bitset<32>{};
+
+	//return bitset<32>(_byteswap_ulong(A));
+	return ss.str();
 }
