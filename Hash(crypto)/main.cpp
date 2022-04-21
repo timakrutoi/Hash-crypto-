@@ -4,6 +4,7 @@
 #include <random>
 #include <algorithm>
 
+
 std::string random_string(std::size_t length, uint16_t seed=1234) {
 	const std::string CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,:;";
 
@@ -111,8 +112,51 @@ void test_signature(string m, InfInt q, InfInt p, InfInt e = 65537) {
 	cout << "Decrypted mes: \n\t" << decrypted << endl;
 }
 
-int main() {
+void smth() {
+	int x = 0, y = 0, n = 12345;
+
+	// auto r = gcdExtended(1071, 462, &x, &y, n);
+	auto r = rational2contfrac(1071, 462);
+	tuple<vector<int>, vector<int>> d = nice_frac<int>(r);
+
+	for (auto i = 0; i < r.size(); ++i) {
+		cout << r[i] << " ";
+	}
+	cout << endl;
+
+	auto& [p, q] = d;
+
+	for (auto i = 0; i < p.size(); ++i) {
+		cout << p[i] << " / " << q[i] << " ; ";
+	}
+
+}
+
+void test_Wiener_attack() {
 	InfInt q = "849787074319711721459362812091";
 	InfInt p = "725486187367325002596395878223";
-	test_signature("1234", q, p);
+	InfInt e = "9924420827570144915815808938527800493563956194056715753173";
+
+	RSA r(q, p, e);
+
+	cout << "PRIVATE KEY : " << r.get_private_key() << endl;
+	cout << "          N : " << r.get_n() << endl;
+
+
+	//1779399043 2796304957
+
+	Wiener_attack(e, r.get_n());
+	//Wiener_attack((InfInt)1779399043, (InfInt)2796304957);
+}
+
+int main() {
+	test_Wiener_attack();
+	InfInt q = "849787074319711721459362812091";
+	InfInt p = "725486187367325002596395878223";
+	InfInt e = "9924420827570144915815808938527800493563956194056715753173";
+
+
+	// test_crypt("14314145435", q, p);
+	// test_signature("1234", q, p, e);
+
 }
